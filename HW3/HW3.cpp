@@ -12,8 +12,7 @@
 enum { UP, LEFT, DOWN, RIGHT, EXIT_GAME = 32, PAUSE = 112 };
 enum { MAX_LEVEL = 10, MAX_TAIL_SIZE = 1845, START_TAIL_SIZE = 1 };
 
-struct control_buttons
-{
+struct control_buttons {
 	int up;
 	int left;
 	int down;
@@ -24,14 +23,12 @@ struct control_buttons default_controls[4] = {	{ 3,   4,   2,   5},
 												{'F', 'D', 'K', '2'},
 												{'&', '$', '+', 18} };
 
-typedef struct tail_t
-{
+typedef struct tail_t {
 	int x;
 	int y;
 } tail_t;
 
-typedef struct snake_t
-{
+typedef struct snake_t {
 	int x;
 	int y;
 	int direction;
@@ -43,29 +40,25 @@ typedef struct snake_t
 	char tail_char;
 } snake_t;
 
-typedef struct food_t
-{
+typedef struct food_t {
 	int x;
 	int y;
 	char point;
 } food_t;
 
-void initTail(struct tail_t t[], size_t size)
-{
+void initTail(struct tail_t t[], size_t size) {
 	struct tail_t init_t = { 0,0 };
 	for (size_t i = 0; i < size; i++)
 	{
 		t[i] = init_t;
 	}
 }
-void initHead(struct snake_t* head, int x, int y)
-{
+void initHead(struct snake_t* head, int x, int y) {
 	head->x = x;
 	head->y = y;
 	head->direction = RIGHT;
 }
-void initSnake(snake_t* head, size_t size, int x, int y, char head_char, char tail_char)
-{
+void initSnake(snake_t* head, size_t size, int x, int y, char head_char, char tail_char) {
 	tail_t* tail = (tail_t*) malloc(MAX_TAIL_SIZE * sizeof(tail_t));
 	initTail(tail, MAX_TAIL_SIZE);
 	initHead(head, x, y);
@@ -114,7 +107,7 @@ void go(struct snake_t* head) {
 	}
 }
 
-void goTail(struct snake_t* head){
+void goTail(struct snake_t* head) {
 	mvprintw(head->tail[head->tail_size - 1].y, head->tail[head->tail_size - 1].x, " ");
 	for (size_t i = head->tail_size - 1; i > 0; i--)
 	{
