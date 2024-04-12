@@ -257,7 +257,6 @@ int main() {
 	putFood(food, snake);
 	while (key_pressed != EXIT_GAME) {
 		key_pressed = tolower(getch());
-		mvprintw(29, 1, "%lf", DELAY);
 		if (key_pressed == 55 || key_pressed == 23)
 			key_pressed = 112;
 
