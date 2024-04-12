@@ -1,0 +1,4 @@
+﻿  HW3.cpp
+E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(191,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(203,14): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  HW3.vcxproj -> E:\GeekBrains\Advanced_C\Homeworks\HW3\Debug\HW3.exe
