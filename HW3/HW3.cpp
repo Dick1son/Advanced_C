@@ -38,6 +38,7 @@ typedef struct snake_t {
 	struct control_buttons controls[4];
 	char head_char;
 	char tail_char;
+	uint8_t color;
 } snake_t;
 
 typedef struct food_t {
@@ -45,6 +46,35 @@ typedef struct food_t {
 	int y;
 	char point;
 } food_t;
+
+int cursor(int y, int start_x, int end_x, int shift) {
+	int cursor = start_x;
+	int result = 0;
+	char key = 0; 
+
+	while (key != 13) {
+
+		key = tolower(getch());
+
+		if (key == 5 || key == 'd' || key == '2' || key == 18) {
+			mvdelch(y, cursor);
+			cursor += shift;
+		}
+		if (key == 4 || key == 'a' || key == 'D' || key == '$') {
+			mvdelch(y, cursor);
+			cursor -= shift;
+		}
+
+		if (cursor > end_x) cursor = start_x;
+		if (cursor < start_x) cursor = end_x;
+
+		mvprintw(y, cursor, "^");
+		if (key == 13)
+			result = (cursor - start_x) / shift;
+	}
+
+	return result;
+}
 
 void initTail(struct tail_t t[], size_t size) {
 	struct tail_t init_t = { 0,0 };
@@ -58,7 +88,7 @@ void initHead(struct snake_t* head, int x, int y) {
 	head->y = y;
 	head->direction = RIGHT;
 }
-void initSnake(snake_t* head, size_t size, int x, int y, char head_char, char tail_char) {
+void initSnake(snake_t* head, size_t size, int x, int y, char head_char, char tail_char, uint8_t color) {
 	tail_t* tail = (tail_t*) malloc(MAX_TAIL_SIZE * sizeof(tail_t));
 	initTail(tail, MAX_TAIL_SIZE);
 	initHead(head, x, y);
@@ -67,6 +97,7 @@ void initSnake(snake_t* head, size_t size, int x, int y, char head_char, char ta
 	head->head_char = head_char;
 	head->tail_char = tail_char;
 	head->level = 0;
+	head->color = color;
 	for (uint8_t i = 0; i < sizeof(default_controls) / sizeof(default_controls[0]); i++)
 		head->controls[i] = default_controls[i];
 }
@@ -76,47 +107,50 @@ void initFood(food_t* food, int x, int y, char point) {
 	food->point = point;
 }
 
-void go(struct snake_t* head) {
-	attrset(A_BOLD | COLOR_PAIR(2));
+void go(snake_t* snake) {
+	attron(COLOR_PAIR(snake->color));
 
-	mvprintw(head->y, head->x, " ");
-	switch (head->direction)
+	mvprintw(snake->y, snake->x, " ");
+	switch (snake->direction)
 	{
 	case LEFT:
-		if (head->x <= MIN_X)
-			head->x = MAX_X;
-		mvprintw(head->y, --(head->x), "%c", head->head_char);
+		if (snake->x <= MIN_X)
+			snake->x = MAX_X;
+		mvprintw(snake->y, --(snake->x), "%c", snake->head_char);
 		break;
 	case RIGHT:
-		if (head->x >= MAX_X)
-			head->x = MIN_X;
-		mvprintw(head->y, ++(head->x), "%c", head->head_char);
+		if (snake->x >= MAX_X)
+			snake->x = MIN_X;
+		mvprintw(snake->y, ++(snake->x), "%c", snake->head_char);
 		break;
 	case UP:
-		if (head->y <= MIN_Y)
-			head->y = MAX_Y;
-		mvprintw(--(head->y), head->x, "%c", head->head_char);
+		if (snake->y <= MIN_Y)
+			snake->y = MAX_Y;
+		mvprintw(--(snake->y), snake->x, "%c", snake->head_char);
 		break;
 	case DOWN:
-		if (head->y >= MAX_Y)
-			head->y = MIN_Y;
-		mvprintw(++(head->y), head->x, "%c", head->head_char);
+		if (snake->y >= MAX_Y)
+			snake->y = MIN_Y;
+		mvprintw(++(snake->y), snake->x, "%c", snake->head_char);
 		break;
 	default:
 		break;
 	}
+	attroff(COLOR_PAIR(snake->color));
 }
 
-void goTail(struct snake_t* head) {
-	mvprintw(head->tail[head->tail_size - 1].y, head->tail[head->tail_size - 1].x, " ");
-	for (size_t i = head->tail_size - 1; i > 0; i--)
+void goTail(snake_t* snake) {
+	attron(COLOR_PAIR(snake->color));
+	mvprintw(snake->tail[snake->tail_size - 1].y, snake->tail[snake->tail_size - 1].x, " ");
+	for (size_t i = snake->tail_size - 1; i > 0; i--)
 	{
-		head->tail[i] = head->tail[i - 1];
-		if (head->tail[i].y || head->tail[i].x)
-			mvprintw(head->tail[i].y, head->tail[i].x, "%c", head->tail_char);
+		snake->tail[i] = snake->tail[i - 1];
+		if (snake->tail[i].y || snake->tail[i].x)
+			mvprintw(snake->tail[i].y, snake->tail[i].x, "%c", snake->tail_char);
 	}
-	head->tail[0].x = head->x;
-	head->tail[0].y = head->y;
+	snake->tail[0].x = snake->x;
+	snake->tail[0].y = snake->y;
+	attroff(COLOR_PAIR(snake->color));
 }
 
 uint8_t checkDirection(snake_t* snake, int32_t key) {
@@ -138,29 +172,49 @@ uint8_t checkDirection(snake_t* snake, int32_t key) {
 	return res;
 }
 
-bool checkEat(snake_t* snake, food_t* food) {
+bool checkEat(snake_t* snake, food_t* food, snake_t* snake_bot) {
 	if (snake->x == food->x && snake->y == food->y) {
 		snake->level++;
 		snake->tail_size++;
 		return 1;
 	}
+	if (snake_bot->x == food->x && snake_bot->y == food->y) {
+		snake_bot->tail_size++;
+		return 1;
+	}
 	return 0;
 }
 
-bool checkWin(snake_t* snake) {
+bool checkWin(snake_t* snake, snake_t* snake_bot) {
 	if (snake->level == MAX_LEVEL) {
-		attrset(A_BOLD | COLOR_PAIR(2));
+		attron(COLOR_PAIR(2));
 		mvprintw(1, 52, "WIN!!!");
 		return 1;
 	}
-	else {
-		for (uint16_t i = 2; i < snake->tail_size - 1; i++) {
-			if (snake->x == snake->tail[i].x && snake->y == snake->tail[i].y) {
-				attrset(A_BOLD | COLOR_PAIR(3));
-				mvprintw(1, 52, "LOSE ");
-				return 1;
-			}
+
+	if (snake_bot->level == MAX_LEVEL) {
+		attron(COLOR_PAIR(2));
+		mvprintw(1, 52, "LOSE ");
+		return 1;
+	}
+	for (uint16_t i = 1; i < snake->tail_size - 1; i++) {
+		if (snake->x == snake->tail[i].x && snake->y == snake->tail[i].y){
+			attron(COLOR_PAIR(3));
+			mvprintw(1, 52, "LOSE ");
+			return 1;
 		}
+	}
+	for (uint16_t i = 0; i < snake_bot->tail_size - 1; i++) {
+		if (snake->x == snake_bot->tail[i].x && snake->y == snake_bot->tail[i].y) {
+			attron(COLOR_PAIR(3));
+			mvprintw(1, 52, "LOSE ");
+			return 1;
+		}
+	}
+	if (snake->x == snake_bot->x && snake->y == snake_bot->y) {
+		attron(COLOR_PAIR(3));
+		mvprintw(1, 52, "LOSE ");
+		return 1;
 	}
 
 	return 0;
@@ -179,33 +233,47 @@ void changeDirection(snake_t* snake, const int32_t key) {
 	}
 }
 
-void putFood(food_t* food, snake_t* snake) {
-	attrset(A_BOLD | COLOR_PAIR(3));
-	srand(time(NULL));
+void putFood(food_t* food, snake_t* snake, snake_t* snake_bot) {
+	attron(COLOR_PAIR(3));
+
 	uint16_t i = 0;
-	uint16_t put_verify = 0;
+	uint16_t j = 0;
+	//uint16_t put_verify = 0;
+	char put_place;
+	bool put_verify = 0;
 	food->x = rand() % ((MAX_X - 1) - (MIN_X + 1) + 1) + MIN_X + 1;
 	food->y = rand() % ((MAX_Y - 1) - (MIN_Y + 1) + 1) + MIN_Y + 1;
 
-	while (put_verify != snake->tail_size)
-	{
-		if ((food->x != snake->x || food->y != snake->y) && (food->x != snake->tail[i].x || food->y != snake->tail[i].y))
-			put_verify++;
-		if (i == snake->tail_size - 1) {
-			i = 0;
+	put_place = mvinch(food->y, food->x);
+	//while (put_verify != snake->tail_size + snake_bot->tail_size)
+	//{
+	//	if ((food->x != snake->x || food->y != snake->y) && (food->x != snake->tail[i].x || food->y != snake->tail[i].y))
+	//		put_verify++;
+	//	if (i == snake->tail_size + snake_bot->tail_size - 1) {
+	//		i = 0;
+	//		srand(time(NULL));
+	//		food->x = rand() % ((MAX_X - 1) - (MIN_X + 1) + 1) + MIN_X + 1;
+	//		food->y = rand() % ((MAX_Y - 1) - (MIN_Y + 1) + 1) + MIN_Y + 1;
+	//	}
+	//	
+	//	i++;
+	//}
+	while (put_verify == 0) {
+		if (put_place != '#' || put_place != '@') {
+			put_verify = 1;
+			mvprintw(food->y, food->x, "%c", food->point);
+		}
+		else {
 			srand(time(NULL));
 			food->x = rand() % ((MAX_X - 1) - (MIN_X + 1) + 1) + MIN_X + 1;
 			food->y = rand() % ((MAX_Y - 1) - (MIN_Y + 1) + 1) + MIN_Y + 1;
 		}
-		
-		i++;
 	}
-	mvprintw(food->y, food->x, "%c", food->point);
 }
 
 void showMap(snake_t* snake) {
 
-	attrset(A_BOLD | COLOR_PAIR(1));
+	attron(COLOR_PAIR(1));
 
 	mvprintw(1, MIN_X, "Level < %d > ", snake->level);
 
@@ -221,33 +289,108 @@ void showMap(snake_t* snake) {
 		}
 
 	}
+	
+}
+
+void generateSnakeDirection(snake_t* snake, food_t* food) {
+	if ((snake->direction == LEFT || snake->direction == RIGHT) && snake->y == food->y) {
+		return;
+	}
+	if ((snake->direction == LEFT || snake->direction == RIGHT) && snake->y != food->y) {
+		if (food->x == snake->x && food->y < snake->y) {
+			snake->direction = UP;
+		}
+		if (food->x == snake->x && food->y > snake->y) {
+			snake->direction = DOWN;
+		}
+		return;
+	}
+	if ((snake->direction == UP || snake->direction == DOWN) && snake->x == food->x) {
+		return;
+	}
+	if ((snake->direction == UP || snake->direction == DOWN) && snake->x != food->x) {
+		if (food->y == snake->y && food->x > snake->x) {
+			snake->direction = RIGHT;
+		}
+		if (food->y == snake->y && food->x < snake->x) {
+			snake->direction = LEFT;
+		}
+		return;
+	}
+	if (snake->direction == UP && (mvinch(snake->y - 1, snake->x) == '#') || (mvinch(snake->y - 1, snake->x) == '@'))
+		snake->direction = LEFT;
+	if (snake->direction == DOWN && (mvinch(snake->y + 1, snake->x) == '#') || (mvinch(snake->y + 1, snake->x) == '@'))
+		snake->direction = RIGHT;
+	if (snake->direction == LEFT && (mvinch(snake->y, snake->x - 1) == '#') || (mvinch(snake->y, snake->x - 1) == '@'))
+		snake->direction = UP;
+	if (snake->direction == RIGHT && (mvinch(snake->y, snake->x - 1) == '#') || (mvinch(snake->y, snake->x - 1) == '@'))
+		snake->direction = DOWN;
+}
+
+int8_t startMenu(snake_t* snake) {
+	char key = 0;
+	uint8_t color;
+	uint8_t result;
+	snake_t* snake_bot = 0;
+
+	init_pair(1, COLOR_WHITE, COLOR_BLUE);
+	init_pair(2, COLOR_GREEN, COLOR_BLUE);
+	init_pair(3, COLOR_RED, COLOR_BLUE);
+	init_pair(4, COLOR_CYAN, COLOR_BLUE);
+	init_pair(5, COLOR_MAGENTA, COLOR_BLUE);
+	init_pair(6, COLOR_YELLOW, COLOR_BLUE);
+	init_pair(7, COLOR_BLACK, COLOR_BLUE);
+
+	noecho();
+	curs_set(FALSE);
+
+	mvprintw(3, 3, "choose mode:");
+	mvprintw(3, 17, "Solo\tPvE");
+	result = cursor(4, 18, 26, 7);
+
+	clear();
+
+	mvprintw(3, 3, "choose color:");
+
+	for (int i = 2; i <= 7; i++) {
+		attron(COLOR_PAIR(i));
+		mvprintw(3, (i - 1) * 4 + 14, "@##");
+		attroff(COLOR_PAIR(i));
+	}
+
+	color = cursor(4, 19, 39, 4) + 2;
+	initSnake(snake, START_TAIL_SIZE, 12, 10, '@', '#', color);
+
+	clear();
+	return result;
 }
 
 int main() {
 	double DELAY = 0.15;
 	char key_pressed = 0;
 	snake_t* snake = (snake_t*) malloc(sizeof(snake_t));
+	snake_t* snake_bot = (snake_t*)malloc(sizeof(snake_t));
 	food_t* food = (food_t*)malloc(sizeof(food_t));
+	uint8_t bot_color;
+	uint8_t mode;
 	bool pause_flag = 0;
 
-	initSnake(snake, START_TAIL_SIZE, 12, 10, '@', '#');
-	initFood(food, 0, 0, '+');
 	initscr();
 
 	keypad(stdscr, TRUE);
 	raw();
-	noecho();
-	curs_set(FALSE);
 	start_color();
-	init_pair(1, COLOR_WHITE, COLOR_BLUE);
-	init_pair(2, COLOR_GREEN, COLOR_BLUE);
-	init_pair(3, COLOR_RED, COLOR_BLUE);
 	bkgd(COLOR_PAIR(1));
-	attrset(A_BOLD | COLOR_PAIR(1));
+	srand(time(NULL));
+
+	initSnake(snake_bot, START_TAIL_SIZE, 12, 12, '@', '#', 1);
+	initFood(food, 0, 0, '$');
 
 	timeout(0);
 
-	putFood(food, snake);
+	mode = startMenu(snake);
+
+	putFood(food, snake, snake_bot);
 	while (key_pressed != EXIT_GAME) {
 		key_pressed = tolower(getch());
 		if (key_pressed == 55 || key_pressed == 23)
@@ -256,17 +399,28 @@ int main() {
 		if (key_pressed != PAUSE && pause_flag == 0) {
 			clock_t begin = clock();
 			showMap(snake);
-			go(snake);
-			goTail(snake);
 
-			if (pause_flag = checkWin(snake)) {
+			if (mode) {
+				generateSnakeDirection(snake_bot, food);
+				go(snake);
+				go(snake_bot);
+				goTail(snake);
+				goTail(snake_bot);
+			}
+			else {
+				go(snake);
+				goTail(snake);				
+			}
+
+			if (pause_flag = checkWin(snake, snake_bot)) {
 				showMap(snake);
 				continue;
-			}else if (checkEat(snake, food)) {
+			}
+			else if (checkEat(snake, food, snake_bot)) {
 					if ((snake->level + 1) % (MAX_LEVEL / 10) == 0)
 						DELAY -= 0.01;
-					putFood(food, snake);
-				}
+					putFood(food, snake, snake_bot);
+			}
 
 			if (checkDirection(snake, key_pressed) == sizeof(default_controls) / sizeof(default_controls[0]))
 				changeDirection(snake, key_pressed);
@@ -280,7 +434,7 @@ int main() {
 			mvprintw(1, 52, "     ");
 		}
 		else if (key_pressed == PAUSE && pause_flag == 0) {
-			attrset(A_BOLD | COLOR_PAIR(3));
+			attron(COLOR_PAIR(3));
 			pause_flag = 1;
 			mvprintw(1, 52, "PAUSE");
 		}
