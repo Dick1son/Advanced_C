@@ -1,4 +1,7 @@
 ﻿  HW3.cpp
-E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(191,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(203,14): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(247,20): warning C4244: '=': conversion from 'chtype' to 'char', possible loss of data
+E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(267,14): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(384,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+E:\GeekBrains\Advanced_C\Homeworks\HW3\HW3.cpp(374,10): warning C4101: 'bot_color': unreferenced local variable
+  LINK : E:\GeekBrains\Advanced_C\Homeworks\HW3\Debug\HW3.exe not found or not built by the last incremental link; performing full link
   HW3.vcxproj -> E:\GeekBrains\Advanced_C\Homeworks\HW3\Debug\HW3.exe
