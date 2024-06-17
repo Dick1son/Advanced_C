@@ -1,5 +1,22 @@
-﻿  main.cpp
+﻿  init.cpp
+E:\GeekBrains\Advanced_C\Homeworks\HW7\include\curses.h(160,1): warning C4005: 'MOUSE_MOVED': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\wincontypes.h(103): message : see previous definition of 'MOUSE_MOVED'
+  logic.cpp
+E:\GeekBrains\Advanced_C\Homeworks\HW7\include\curses.h(160,1): warning C4005: 'MOUSE_MOVED': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\wincontypes.h(103): message : see previous definition of 'MOUSE_MOVED'
+  main.cpp
 E:\GeekBrains\Advanced_C\Homeworks\HW7\include\curses.h(160,1): warning C4005: 'MOUSE_MOVED': macro redefinition
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\wincontypes.h(103): message : see previous definition of 'MOUSE_MOVED'
 E:\GeekBrains\Advanced_C\Homeworks\HW7\main.cpp(52,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  move.cpp
+E:\GeekBrains\Advanced_C\Homeworks\HW7\include\curses.h(160,1): warning C4005: 'MOUSE_MOVED': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\wincontypes.h(103): message : see previous definition of 'MOUSE_MOVED'
+  pumpkin.cpp
+E:\GeekBrains\Advanced_C\Homeworks\HW7\include\curses.h(160,1): warning C4005: 'MOUSE_MOVED': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\wincontypes.h(103): message : see previous definition of 'MOUSE_MOVED'
+  my_time.cpp
+E:\GeekBrains\Advanced_C\Homeworks\HW7\include\curses.h(160,1): warning C4005: 'MOUSE_MOVED': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\wincontypes.h(103): message : see previous definition of 'MOUSE_MOVED'
+E:\GeekBrains\Advanced_C\Homeworks\HW7\my_time.cpp(8,16): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  Generating Code...
   HW7.vcxproj -> E:\GeekBrains\Advanced_C\Homeworks\HW7\Debug\HW7.exe

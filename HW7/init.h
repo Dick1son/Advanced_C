@@ -1,5 +1,6 @@
 #pragma once
 
+#define PDC_WIDE
 #define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #include <stdint.h>
@@ -14,7 +15,6 @@
 #define MAP_MAX_Y max_y - MAP_MIN_Y
 #define MAP_MAX_X max_x - MAP_MIN_X
 
-#define PDC_WIDE
 #define COLOR_ORANGE (COLOR_YELLOW | COLOR_GREEN) 
 
 enum { UP, LEFT, DOWN, RIGHT, PLAY = 1, PAUSE, EXIT };

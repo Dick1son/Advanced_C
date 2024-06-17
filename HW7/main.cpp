@@ -3,35 +3,6 @@
 #include "my_time.h"
 #include "logic.h"
 
-void generateMakefile(const char* projectName, const char** sourceFiles, const char** headerFiles, int numSources, int numHeaders) {
-	FILE* makefile = fopen("Makefile", "w");
-
-	// Write the common makefile content
-	fprintf(makefile, "CC = gcc\nCFLAGS = -Wall\n\n");
-
-	// Write project target and dependency rule
-	fprintf(makefile, "%s: ", projectName);
-	for (int i = 0; i < numSources; i++) {
-		fprintf(makefile, "%s.o ", sourceFiles[i]);
-	}
-	fprintf(makefile, "\n\t$(CC) -o %s ", projectName);
-	for (int i = 0; i < numSources; i++) {
-		fprintf(makefile, "%s.o ", sourceFiles[i]);
-	}
-	fprintf(makefile, "\n\n");
-
-	// Write individual compilation rules
-	for (int i = 0; i < numSources; i++) {
-		fprintf(makefile, "%s.o: %s.cpp ", sourceFiles[i], sourceFiles[i]);
-		for (int j = 0; j < numHeaders; j++) {
-			fprintf(makefile, "%s.h ", headerFiles[j]);
-		}
-		fprintf(makefile, "\n\t$(CC) $(CFLAGS) -c %s.cpp\n\n", sourceFiles[i]);
-	}
-
-	fclose(makefile);
-}
-
 int main() {
 	const char* project = "drone";
 	const char* sources[] = { "main", "init", "logic", "move", "my_time", "pumpkin"};
@@ -39,8 +10,6 @@ int main() {
 
 	double DELAY = 0.15;
 	int key_pressed = 0;
-
-	generateMakefile(project, sources, headers, 6, 7);
 
 	initScreen();
 	initMap();
