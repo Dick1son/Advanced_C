@@ -144,12 +144,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="init.cpp" />
+    <ClCompile Include="logic.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="move.cpp" />
+    <ClCompile Include="pumpkin.cpp" />
+    <ClCompile Include="my_time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="init.h" />
+    <ClInclude Include="logic.h" />
     <ClInclude Include="move.h" />
+    <ClInclude Include="pumpkin.h" />
+    <ClInclude Include="my_time.h" />
+    <ClInclude Include="unicode_chars.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

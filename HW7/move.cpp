@@ -3,45 +3,42 @@
 void moveDrone(drone_t* drone) {
 	attron(COLOR_PAIR(drone->color));
 
-
-	//if (drone->direction != STOP)
-	//	mvprintw(drone->y, drone->x, " ");
-
+	//Move drone
 	switch (drone->direction)
 	{
 		case UP:
-			if (drone->y == MAP_MIN_Y + 1)
-				mvaddwstr(drone->y, drone->x, L"\x25b2");
+			if (drone->y == MAP_MIN_Y + 1 || (drone->x == MAP_MIN_X + 29 && (drone->y == MAP_MIN_Y + 9 || drone->y == MAP_MAX_Y - 9)))
+				mvaddwstr(drone->y, drone->x, DRONE_UP);
 			else {
 				mvprintw(drone->y, drone->x, " ");
-				mvaddwstr(--(drone->y), drone->x, L"\x25b2");
+				mvaddwstr(--(drone->y), drone->x, DRONE_UP);
 			}
 			break;
 
 		case DOWN:
-			if (drone->y == MAP_MAX_Y - 1)
-				mvaddwstr(drone->y, drone->x, L"\x25bc");
+			if (drone->y == MAP_MAX_Y - 1 || (drone->x == MAP_MIN_X + 29 && (drone->y == MAP_MIN_Y + 9 || drone->y == MAP_MAX_Y - 9)))
+				mvaddwstr(drone->y, drone->x, DRONE_DOWN);
 			else {
 				mvprintw(drone->y, drone->x, " ");
-				mvaddwstr(++(drone->y), drone->x, L"\x25bc");
+				mvaddwstr(++(drone->y), drone->x, DRONE_DOWN);
 			}
 			break;
 
 		case LEFT:
-			if (drone->x == MAP_MIN_X + 1)
-				mvaddwstr(drone->y, drone->x, L"\x25c4");
+			if (drone->x == MAP_MIN_X + 1 || (drone->x == MAP_MIN_X + 30 && (drone->y <= MAP_MIN_Y + 8 || drone->y >= MAP_MAX_Y - 8)))
+				mvaddwstr(drone->y, drone->x, DRONE_LEFT);
 			else {
 				mvprintw(drone->y, drone->x, " ");
-				mvaddwstr(drone->y, --(drone->x), L"\x25c4");
+				mvaddwstr(drone->y, --(drone->x), DRONE_LEFT);
 			}
 			break;
 
 		case RIGHT:
-			if (drone->x == MAP_MAX_X - 1)
-				mvaddwstr(drone->y, drone->x, L"\x25ba");
+			if (drone->x == MAP_MAX_X - 1 || (drone->x == MAP_MIN_X + 28 && (drone->y <= MAP_MIN_Y + 8 || drone->y >= MAP_MAX_Y - 8)))
+				mvaddwstr(drone->y, drone->x, DRONE_RIGHT);
 			else {
 				mvprintw(drone->y, drone->x, " ");
-				mvaddwstr(drone->y, ++(drone->x), L"\x25ba");
+				mvaddwstr(drone->y, ++(drone->x), DRONE_RIGHT);
 			}
 			break;
 
@@ -49,31 +46,19 @@ void moveDrone(drone_t* drone) {
 			break;
 	}
 
+	//Move trailer
+	mvprintw(drone->trailer[drone->trailer_size - 1].y, drone->trailer[drone->trailer_size - 1].x, " ");
 	for (size_t i = drone->trailer_size - 1; i > 0; i--)
 	{
 		drone->trailer[i] = drone->trailer[i - 1];
 		if (drone->trailer[i].y || drone->trailer[i].x)
-			mvaddwstr(drone->trailer[i].y, drone->trailer[i].x, L"\x25cb");
+			mvaddwstr(drone->trailer[i].y, drone->trailer[i].x, TRAILER_CH);
 	}
 	drone->trailer[0].x = drone->x;
 	drone->trailer[0].y = drone->y;
 
 	attroff(COLOR_PAIR(drone->color));
 }
-
-//void moveTrailer(drone_t* drone) {
-	//attron(COLOR_PAIR(drone->color));
-	//mvprintw(drone->trailer[drone->trailer_size - 1].y, drone->trailer[drone->trailer_size - 1].x, " ");
-//	for (size_t i = drone->trailer_size - 1; i > 0; i--)
-//	{
-//		drone->trailer[i] = drone->trailer[i - 1];
-//		if (drone->trailer[i].y || drone->trailer[i].x)
-//			mvwaddwstr(map,drone->trailer[i].y, drone->trailer[i].x, L"\x25cb");
-//	}
-//	drone->trailer[0].x = drone->x;
-//	drone->trailer[0].y = drone->y;
-//	attroff(COLOR_PAIR(drone->color));
-//}
 
 bool checkDirection(drone_t* drone, int32_t key) {
 	if (((drone->direction == UP || drone->direction == DOWN) && (key == drone->controls.down || key == drone->controls.up))
@@ -96,6 +81,4 @@ void changeDirection(drone_t* drone, const int32_t key) {
 		drone->direction = RIGHT;
 	else if (key == drone->controls.left)
 		drone->direction = LEFT;
-	//else
-	//	drone->direction = STOP;
 }

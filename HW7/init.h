@@ -7,6 +7,7 @@
 #include <curses.h>
 #include <ctype.h>
 #include <time.h>
+#include "unicode_chars.h"
 
 #define MAP_MIN_Y 3
 #define MAP_MIN_X 5
@@ -14,11 +15,11 @@
 #define MAP_MAX_X max_x - MAP_MIN_X
 
 #define PDC_WIDE
+#define COLOR_ORANGE (COLOR_YELLOW | COLOR_GREEN) 
 
-extern int max_y, max_x;
-
-enum { STOP, UP, LEFT, DOWN, RIGHT, EXIT_GAME = 32, PAUSE = 112 };
-enum { MAX_LEVEL = 10, MAX_TRAILER_SIZE = 1845, START_TRAILER_SIZE = 0 };
+enum { UP, LEFT, DOWN, RIGHT, PLAY = 1, PAUSE, EXIT };
+enum { MAX_NUM_WAVE = 5, TRAILER_MAX_SIZE = 15, TRAILER_START_SIZE = 0, PUMPKIN_MAX_QUANTITY = 15, PUMPKIN_MIN_QUANTITY = 5, MATURATION_TIME_MIN = 10, MATURATION_TIME_MAX = 18};
+enum { BKGD = 1, GREEN, RED, CYAN, MAGENTA, YELLOW, BLACK, ORANGE };
 
 struct control_buttons {
 	int up;
@@ -27,30 +28,35 @@ struct control_buttons {
 	int right;
 };
 
-extern struct control_buttons default_controls;
-
 typedef struct trailer_t{
-	int x;
-	int y;
+	uint16_t x;
+	uint16_t y;
 } trailer_t;
 
 typedef struct drone_t {
-	int x;
-	int y;
-	int direction;
+	uint16_t x;
+	uint16_t y;
 	uint16_t level;
 	size_t trailer_size;
 	struct trailer_t* trailer;
 	struct control_buttons controls;
+	uint8_t direction;
 	uint8_t color;
 } drone_t;
 
-typedef struct pumpkin_t {
-	int x;
-	int y;
-} pumpkin_t;
+struct pumpkin_t {
+	time_t put_time;
+	uint16_t x;
+	uint16_t y;
+	uint8_t maturation_time;
+	bool status;
+};
+
+extern int max_y, max_x;
+extern struct control_buttons default_controls;
+extern struct pumpkin_t harvest[];
 
 void initScreen  (void);
 void initDrone   (drone_t*, uint8_t);
-void initPumpkin (pumpkin_t*, int, int);
+void initPumpkin (void);
 void initMap     (void);
